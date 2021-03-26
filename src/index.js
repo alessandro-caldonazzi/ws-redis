@@ -1,5 +1,6 @@
 let callbacks = {};
 let checkAuthenticationCallback;
+let onConnectionCallback;
 let users = {};
 let groups = {};
 
@@ -38,8 +39,9 @@ function addUser(identifier, ws) {
     users[identifier] = ws;
 }
 
-function addGroup(identifier, ws) {
-    groups[identifier] = ws;
+function addToGroup(identifier, ws) {
+    if (!groups[identifier]) groups[identifier] = [];
+    groups[identifier].push(ws);
 }
 
 function deleteUser(identifier) {
@@ -50,12 +52,22 @@ function deleteGroup(identifier) {
     delete groups[identifier];
 }
 
+function onConnection(callback) {
+    if (typeof callback !== "function")
+        throw new Error("Callback must be a function");
+    if (onConnectionCallback)
+        throw new Error("onConnectionCallback is already defined");
+    onConnectionCallback = callback;
+}
+
 module.exports = {
     onMessage,
-    sendMessage,
+    sendMessageToUser,
+    sendMessageToGroup,
     checkAuthentication,
     addUser,
-    addGroup,
+    addToGroup,
     deleteUser,
     deleteGroup,
+    onConnection,
 };
