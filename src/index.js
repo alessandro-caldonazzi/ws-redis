@@ -12,7 +12,9 @@ function onMessage(channel, callback) {
     callbacks[channel] = callback;
 }
 
-function sendMessage(channel, data) {}
+function sendMessageToUser(identifier, channel, data) {}
+
+function sendMessageToGroup(identifier, channel, data, except) {}
 
 async function handleMessage(json, ws) {
     if (json?.token && checkAuthenticationCallback) {
