@@ -27,6 +27,16 @@ function setup() {
     });
 }
 
+function sendMessageToUser(identifier, channel, data) {
+    if (identifier in handling.users) {
+        handling.users[identifier].send(JSON.stringify({ data, channel }));
+    } else {
+        //redis publish
+    }
+}
+
+function sendMessageToGroup(identifier, channel, data, except) {}
+
 module.exports = {
     ...exposedMethods,
     init: (wsInstance) => {
@@ -42,4 +52,6 @@ module.exports = {
     clean: () => {
         handling.clean();
     },
+    sendMessageToUser,
+    sendMessageToGroup,
 };

@@ -15,10 +15,6 @@ function onMessage(channel, callback) {
     callbacks[channel] = callback;
 }
 
-function sendMessageToUser(identifier, channel, data) {}
-
-function sendMessageToGroup(identifier, channel, data, except) {}
-
 function addUser(identifier, ws) {
     users[identifier] = ws;
 }
@@ -38,8 +34,6 @@ function deleteGroup(identifier) {
 
 module.exports = {
     onMessage,
-    sendMessageToUser,
-    sendMessageToGroup,
     checkAuthentication,
     addUser,
     addToGroup,
