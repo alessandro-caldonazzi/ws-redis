@@ -12,7 +12,7 @@ async function handleMessage(json, ws) {
     }
     if (json?.channel in callbacks && json.data) {
         callbacks[json.channel](
-            { identifier: json.token, message: json.data },
+            { authenticationToken: json.token, message: json.data },
             ws
         );
     }

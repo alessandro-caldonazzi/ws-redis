@@ -1,7 +1,7 @@
 class WsClient {
-    constructor({ url, websocket = null, identifier = null }) {
+    constructor({ url, websocket = null, authenticationToken = null }) {
         if (!websocket) websocket = WebSocket;
-        if (identifier) this.identifier = identifier;
+        if (authenticationToken) this.authenticationToken = authenticationToken;
 
         this.url = url;
         this.connection = new websocket(url);
@@ -13,19 +13,19 @@ class WsClient {
 
     async send(channel, data) {
         let message = { data, channel };
-        if (this.identifier) message.token = this.identifier;
+        if (this.authenticationToken) message.token = this.authenticationToken;
         if (!this.totMessage++) message.isInitial = true;
         if (!this.connection.readyState) await waitConnection(this.connection);
 
-        this.connection.send(JSON.stringify(message));
+        await this.connection.send(JSON.stringify(message));
     }
 
-    setIdentifier(identifier) {
-        this.identifier = identifier;
+    setAuthenticationToken(authenticationToken) {
+        this.authenticationToken = authenticationToken;
     }
 
-    getTotMessage() {
-        return this.totMessage;
+    getTotMessages() {
+        return this.totMessage - 1;
     }
 
     onMessage(channel, callback) {
@@ -39,10 +39,14 @@ class WsClient {
     }
 
     _handleMessage = ({ data }) => {
+        data = JSON.parse(data);
         if (data?.channel in this.callbacks && data.data) {
-            this.callbacks[channel](data.data, ws);
+            this.callbacks[data.channel](data.data);
         }
     };
+    close() {
+        this.connection.close();
+    }
 }
 
 async function waitConnection(connection) {
