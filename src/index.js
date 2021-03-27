@@ -6,11 +6,19 @@ let websocket;
 
 function setup() {
     websocket.on("connection", function connection(ws) {
-        console.log("ws connection");
-        ws.on("message", function incoming(message) {
+        ws.on("message", async function incoming(message) {
             if (!utils.isJson(message)) return;
             message = JSON.parse(message);
             if (utils.isInitial(message)) {
+                let checkAuthenticationCallback =
+                    handling.config.checkAuthenticationCallback;
+
+                if (message.token && checkAuthenticationCallback) {
+                    const isAuthenticated = await checkAuthenticationCallback(
+                        message.token
+                    );
+                    if (!isAuthenticated) return;
+                }
                 handling.config.onConnectionCallback(ws, message.token);
             } else {
                 handling.handleMessage(message, ws);
@@ -27,5 +35,11 @@ module.exports = {
         }
         websocket = wsInstance;
         setup();
+    },
+    close: () => {
+        websocket.close();
+    },
+    clean: () => {
+        handling.clean();
     },
 };

@@ -34,6 +34,13 @@ function checkAuthentication(callback) {
     config.checkAuthenticationCallback = callback;
 }
 
+function clean() {
+    for (var member in callbacks) delete callbacks[member];
+    for (var member in config) delete config[member];
+    for (var member in users) delete users[member];
+    for (var member in groups) delete groups[member];
+}
+
 module.exports = {
     callbacks,
     config,
@@ -42,4 +49,5 @@ module.exports = {
     handleMessage,
     onConnection,
     checkAuthentication,
+    clean,
 };
