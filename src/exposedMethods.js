@@ -1,10 +1,9 @@
 let {
     callbacks,
-    checkAuthenticationCallback,
-    onConnectionCallback,
     users,
     groups,
     onConnection,
+    checkAuthentication,
 } = require("./handling");
 
 function onMessage(channel, callback) {
@@ -19,14 +18,6 @@ function onMessage(channel, callback) {
 function sendMessageToUser(identifier, channel, data) {}
 
 function sendMessageToGroup(identifier, channel, data, except) {}
-
-function checkAuthentication(callback) {
-    if (typeof callback !== "function")
-        throw new Error("Callback must be a function");
-    if (checkAuthenticationCallback)
-        throw new Error("Authentication Callback is already defined");
-    checkAuthenticationCallback = callback;
-}
 
 function addUser(identifier, ws) {
     users[identifier] = ws;

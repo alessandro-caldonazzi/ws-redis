@@ -26,6 +26,14 @@ function onConnection(callback) {
     config.onConnectionCallback = callback;
 }
 
+function checkAuthentication(callback) {
+    if (typeof callback !== "function")
+        throw new Error("Callback must be a function");
+    if (config.checkAuthenticationCallback)
+        throw new Error("Authentication Callback is already defined");
+    config.checkAuthenticationCallback = callback;
+}
+
 module.exports = {
     callbacks,
     config,
@@ -33,4 +41,5 @@ module.exports = {
     groups,
     handleMessage,
     onConnection,
+    checkAuthentication,
 };
