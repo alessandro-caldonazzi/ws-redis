@@ -18,7 +18,6 @@ class WsClient {
         if (!this.connection.readyState) await waitConnection(this.connection);
 
         this.connection.send(JSON.stringify(message));
-        console.log("sent " + data);
     }
 
     setIdentifier(identifier) {
