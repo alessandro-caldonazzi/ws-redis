@@ -1,8 +1,11 @@
-let callbacks = {};
-let checkAuthenticationCallback;
-let onConnectionCallback;
-let users = {};
-let groups = {};
+let {
+    callbacks,
+    checkAuthenticationCallback,
+    onConnectionCallback,
+    users,
+    groups,
+    onConnection,
+} = require("./handling");
 
 function onMessage(channel, callback) {
     if (typeof channel !== "string") throw new Error("Invalid channel name");
@@ -40,14 +43,6 @@ function deleteUser(identifier) {
 
 function deleteGroup(identifier) {
     delete groups[identifier];
-}
-
-function onConnection(callback) {
-    if (typeof callback !== "function")
-        throw new Error("Callback must be a function");
-    if (onConnectionCallback)
-        throw new Error("onConnectionCallback is already defined");
-    onConnectionCallback = callback;
 }
 
 module.exports = {
