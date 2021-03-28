@@ -5,7 +5,7 @@ class WsClient {
 
         this.url = url;
         this.connection = new websocket(url);
-        this.connection.onmessage = this._handleMessage;
+        this.connection.onmessage = this.handleMessage;
         this.totMessage = 0;
         this.callbacks = {};
         this.send(null, "connection");
@@ -38,12 +38,12 @@ class WsClient {
         this.callbacks[channel] = callback;
     }
 
-    _handleMessage({ data }) {
+    handleMessage = ({ data }) => {
         data = JSON.parse(data);
         if (data?.channel in this.callbacks && data.data) {
             this.callbacks[data.channel](data.data);
         }
-    }
+    };
 
     close() {
         this.connection.close();
@@ -55,7 +55,7 @@ class WsClient {
 }
 
 async function waitConnection(connection) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         let i = 0;
         const listener = setInterval(() => {
             if (connection.readyState) {
