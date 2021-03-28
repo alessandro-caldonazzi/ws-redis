@@ -35,10 +35,10 @@ function checkAuthentication(callback) {
 }
 
 function clean() {
-    for (var member in callbacks) delete callbacks[member];
-    for (var member in config) delete config[member];
-    for (var member in users) delete users[member];
-    for (var member in groups) delete groups[member];
+    for (let member in callbacks) delete callbacks[member];
+    for (let member in config) delete config[member];
+    for (let member in users) delete users[member];
+    for (let member in groups) delete groups[member];
 }
 
 module.exports = {

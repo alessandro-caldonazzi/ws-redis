@@ -8,7 +8,7 @@ function isJson(str) {
 }
 
 function isInitial(json) {
-    return json.isInitial == true;
+    return json.isInitial === true;
 }
 
 module.exports = {

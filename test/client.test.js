@@ -38,7 +38,6 @@ test("send/receive on channel", (done) => {
     });
 
     connection.onMessage("testChannel", (message) => {
-        console.log("arrivato");
         expect(message).toBe("testMessage");
         done();
     });
@@ -110,9 +109,9 @@ test("send/receive on group", (done) => {
 afterEach(() => {
     wsRedis.close();
     wsRedis.clean();
-    try {
+    if (connection.getReadyState()) {
         connection.close();
-    } catch (error) {}
+    }
 });
 
 module.exports = {
