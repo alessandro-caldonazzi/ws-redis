@@ -38,22 +38,24 @@ class WsClient {
         this.callbacks[channel] = callback;
     }
 
-    _handleMessage = ({ data }) => {
+    _handleMessage({ data }) {
         data = JSON.parse(data);
         if (data?.channel in this.callbacks && data.data) {
             this.callbacks[data.channel](data.data);
         }
-    };
+    }
+
     close() {
         this.connection.close();
     }
+
     getReadyState() {
         return this.connection.readyState;
     }
 }
 
 async function waitConnection(connection) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         let i = 0;
         const listener = setInterval(() => {
             if (connection.readyState) {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 const WsClient = require("../src/client/client");
 const WebSocket = require("ws");
 const wsRedis = require("../src/index");
