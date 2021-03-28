@@ -47,6 +47,9 @@ class WsClient {
     close() {
         this.connection.close();
     }
+    getReadyState() {
+        return this.connection.readyState;
+    }
 }
 
 async function waitConnection(connection) {
