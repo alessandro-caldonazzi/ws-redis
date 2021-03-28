@@ -35,7 +35,15 @@ function sendMessageToUser(identifier, channel, data) {
     }
 }
 
-function sendMessageToGroup(identifier, channel, data, except) {}
+function sendMessageToGroup(identifier, channel, data, except) {
+    if (identifier in handling.groups) {
+        handling.groups[identifier].forEach((user) => {
+            user.send(JSON.stringify({ data, channel }));
+        });
+    } else {
+        //redis publish
+    }
+}
 
 module.exports = {
     ...exposedMethods,
