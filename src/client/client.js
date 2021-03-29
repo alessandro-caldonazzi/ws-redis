@@ -22,6 +22,10 @@ class WsClient {
 
     setAuthenticationToken(authenticationToken) {
         this.authenticationToken = authenticationToken;
+        this.send("reservedChannelWs", {
+            action: "setAuthenticationToken",
+            token: this.authenticationToken,
+        });
     }
 
     getTotMessages() {

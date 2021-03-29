@@ -10,6 +10,9 @@ async function handleMessage(json, ws) {
         );
         if (!isAuthenticated) return;
     }
+    if (json?.channel == "reservedChannelWs") {
+        reservedChannelHandle(ws, json.data);
+    }
     if (json?.channel in callbacks && json.data) {
         callbacks[json.channel](
             { authenticationToken: json.token, message: json.data },
@@ -39,6 +42,15 @@ function clean() {
     for (let member in config) delete config[member];
     for (let member in users) delete users[member];
     for (let member in groups) delete groups[member];
+}
+
+function reservedChannelHandle(ws, data) {
+    for (let identifier in users) {
+        if (users[identifier] == ws) {
+            delete users[identifier];
+            config.onConnectionCallback(ws, data.token);
+        }
+    }
 }
 
 module.exports = {

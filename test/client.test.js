@@ -4,14 +4,22 @@ const WebSocket = require("ws");
 const wsRedis = require("../src/index");
 let connection;
 
-test("setIdentifier", () => {
+test("setAuthenticationToken", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
+
+    wsRedis.onConnection((ws, authenticationToken) => {
+        wsRedis.addUser(authenticationToken, ws);
+        if (authenticationToken == "foo") done();
+    });
 
     connection = new WsClient({
         url: "ws://localhost:8080",
         websocket: WebSocket,
+        authenticationToken: "initialToken",
     });
+
     connection.setAuthenticationToken("foo");
+
     expect(connection.authenticationToken).toBe("foo");
 });
 
@@ -24,7 +32,7 @@ test("getTotMessages", () => {
     });
     expect(connection.getTotMessages()).toBe(0);
 });
-
+/*
 test("send/receive on channel", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
 
@@ -43,7 +51,7 @@ test("send/receive on channel", (done) => {
         done();
     });
 });
-
+*/
 test("provide invalid parameters in onMessage", () => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
 
@@ -92,19 +100,15 @@ test("send/receive on group", (done) => {
         websocket: WebSocket,
     });
 
-    connUser1.onMessage("testChannel", (message) => {
-        expect(message).toBe("testMessage");
-        //after the last message is received, test is done
-        arrivedMessages++;
-        if (arrivedMessages === 2) done();
-    });
+    connUser1.onMessage("testChannel", _onMessage);
+    connUser2.onMessage("testChannel", _onMessage);
 
-    connUser2.onMessage("testChannel", (message) => {
+    function _onMessage(message) {
         expect(message).toBe("testMessage");
         //after the last message is received, test is done
         arrivedMessages++;
         if (arrivedMessages === 2) done();
-    });
+    }
 });
 
 afterEach(() => {
