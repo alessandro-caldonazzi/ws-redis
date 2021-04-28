@@ -17,22 +17,23 @@ test("setAuthenticationToken", (done) => {
         websocket: WebSocket,
         authenticationToken: "initialToken",
     });
+    connection.connect();
 
     connection.setAuthenticationToken("foo");
 
     expect(connection.authenticationToken).toBe("foo");
 });
 
-test("getTotMessages", () => {
+test("getTotMessages", async () => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
 
     connection = new WsClient({
         url: "ws://localhost:8080",
         websocket: WebSocket,
     });
+    await connection.connect();
     expect(connection.getTotMessages()).toBe(0);
 });
-/*
 test("send/receive on channel", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
 
@@ -45,13 +46,14 @@ test("send/receive on channel", (done) => {
         url: "ws://localhost:8080",
         websocket: WebSocket,
     });
+    connection.connect();
 
     connection.onMessage("testChannel", (message) => {
         expect(message).toBe("testMessage");
         done();
     });
 });
-*/
+
 test("provide invalid parameters in onMessage", () => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
 
@@ -73,7 +75,7 @@ test("provide invalid parameters in onMessage", () => {
     }).toThrow(Error);
 });
 
-test("send/receive on group", (done) => {
+test("send/receive on group", async (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
     let connectedUsers = 0,
         arrivedMessages = 0;
@@ -81,12 +83,13 @@ test("send/receive on group", (done) => {
         connectedUsers++;
         //add all connected user to testGroup
         wsRedis.addToGroup("testGroup", ws);
-        if (connectedUsers === 2)
+        if (connectedUsers === 2) {
             wsRedis.sendMessageToGroup(
                 "testGroup",
                 "testChannel",
                 "testMessage"
             );
+        }
     });
 
     //connect two users
@@ -99,6 +102,8 @@ test("send/receive on group", (done) => {
         url: "ws://localhost:8080",
         websocket: WebSocket,
     });
+    await connUser1.connect();
+    await connUser2.connect();
 
     connUser1.onMessage("testChannel", _onMessage);
     connUser2.onMessage("testChannel", _onMessage);
@@ -107,26 +112,31 @@ test("send/receive on group", (done) => {
         expect(message).toBe("testMessage");
         //after the last message is received, test is done
         arrivedMessages++;
-        if (arrivedMessages === 2) done();
+        if (arrivedMessages === 2) {
+            done();
+            connUser1.close();
+            connUser2.close();
+        }
     }
 });
 
-afterEach(() => {
-    wsRedis.close();
+afterEach(async () => {
+    await wsRedis.close();
     wsRedis.clean();
-    if (connection.getReadyState()) {
-        connection.close();
+    if (connection?.getReadyState()) {
+        await connection.close();
     }
 });
 
 module.exports = {
-    connect: () => {
+    connect: async () => {
         const connection = new WsClient({
             url: "ws://localhost:8080",
             websocket: WebSocket,
             authenticationToken: "authenticationToken",
         });
-        setTimeout(() => connection.close(), 100);
+        await connection.connect();
+        connection.close();
     },
     sendMessageToChannel: async () => {
         const connection = new WsClient({
@@ -134,6 +144,7 @@ module.exports = {
             websocket: WebSocket,
             authenticationToken: "authenticationToken",
         });
+        await connection.connect();
         await connection.send("testChannel", "testMessage");
         await connection.send("testChannel", "testMessage");
         connection.close();
