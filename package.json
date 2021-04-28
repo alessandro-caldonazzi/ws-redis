@@ -4,12 +4,13 @@
     "description": "Use redis as publish-subscriber for websocket message delivery",
     "main": "src/index.js",
     "scripts": {
-        "test": "jest test/index.spec.js --coverage"
+        "test": "jest test/index.spec.js --coverage --runInBand --forceExit"
     },
     "author": "Alessandro Caldonazzi",
     "license": "ISC",
     "dependencies": {
-        "ws": "^7.4.4"
+        "ws": "^7.4.4",
+        "ioredis": "4.27.1"
     },
     "devDependencies": {
         "eslint": "^7.23.0",
