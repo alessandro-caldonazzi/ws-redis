@@ -8,7 +8,17 @@ class WsClient {
         this.connection.onmessage = this.handleMessage;
         this.totMessage = 0;
         this.callbacks = {};
-        this.send(null, "connection");
+    }
+
+    async connect() {
+        return new Promise((resolve, reject) => {
+            if (this.getReadyState() == 1) this.send(null, "connection");
+            else
+                this.connection.onopen = (e) => {
+                    this.send(null, "connection");
+                    resolve(true);
+                };
+        });
     }
 
     async send(channel, data) {
@@ -16,7 +26,6 @@ class WsClient {
         if (this.authenticationToken) message.token = this.authenticationToken;
         if (!this.totMessage++) message.isInitial = true;
         if (!this.connection.readyState) await waitConnection(this.connection);
-
         await this.connection.send(JSON.stringify(message));
     }
 
