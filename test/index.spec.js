@@ -2,6 +2,7 @@
 const wsRedis = require("../src/index");
 const WebSocket = require("ws");
 const client = require("./client.test");
+const Redis = require("ioredis");
 
 test("authentication", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
@@ -113,7 +114,53 @@ test("provide invalid json to isJson", () => {
     expect(isJson("this is not a valid Json")).toBe(false);
 });
 
-afterEach(() => {
-    wsRedis.close();
+test("redis pub test sending to user", (done) => {
+    const redisConnection = new Redis();
+    redisConnection.on("connect", () => {
+        redisConnection.on("message", (channel, message) => {
+            message = JSON.parse(message);
+            expect(message.identifier).toBe("userOnAnotherNodeInstance");
+            expect(message.channel).toBe("channel");
+            expect(message.data).toBe("data");
+            expect(message.isGroup).toBe(false);
+            done();
+            redisConnection.disconnect();
+        });
+        redisConnection.subscribe("ws-redis");
+        wsRedis.sendMessageToUser(
+            "userOnAnotherNodeInstance",
+            "channel",
+            "data"
+        );
+    });
+});
+
+test("redis pub test sending to group", (done) => {
+    const redisConnection = new Redis();
+    redisConnection.on("connect", () => {
+        redisConnection.on("message", (channel, message) => {
+            message = JSON.parse(message);
+            expect(message.identifier).toBe("groupAvailableOnAnotherNode");
+            expect(message.channel).toBe("channel");
+            expect(message.data).toBe("data");
+            expect(message.isGroup).toBe(true);
+            done();
+            redisConnection.disconnect();
+        });
+        redisConnection.subscribe("ws-redis");
+        wsRedis.sendMessageToGroup(
+            "groupAvailableOnAnotherNode",
+            "channel",
+            "data"
+        );
+    });
+});
+
+afterEach(async () => {
+    await wsRedis.close();
     wsRedis.clean();
+});
+
+afterAll(() => {
+    //redis.quit();
 });
