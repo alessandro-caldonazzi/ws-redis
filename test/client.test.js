@@ -35,6 +35,7 @@ test("getTotMessages", async () => {
     await connection.connect();
     expect(connection.getTotMessages()).toBe(0);
 });
+
 test("send/receive on channel", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
 
@@ -177,6 +178,27 @@ test("redis sub test (group)", async (done) => {
         expect(message).toBe("testMessage");
         done();
     });
+});
+
+test("client close connection", async (done) => {
+    wsRedis.init(new WebSocket.Server({ port: 8080 }));
+
+    wsRedis.onConnection((ws, authenticationToken) => {
+        wsRedis.addUser("testUser", ws);
+    });
+
+    wsRedis.onClientClosed((identifier, groups) => {
+        expect(identifier).toBe("testUser");
+        expect(groups.length).toBe(0);
+        done();
+    });
+
+    connection = new WsClient({
+        url: "ws://localhost:8080",
+        websocket: WebSocket,
+    });
+    await connection.connect();
+    connection.close();
 });
 
 afterEach(async () => {
