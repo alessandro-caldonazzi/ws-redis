@@ -49,7 +49,32 @@ function reservedChannelHandle(ws, data) {
         }
 
         config.onConnectionCallback(ws, data.token);
+    } else if (data.action == "close") {
+        let userIdentifier = getUserIdentifier(ws);
+        let userGroups = getGroupsByConnection(ws);
+        config.onConnectionClosed?.(userIdentifier, userGroups);
     }
+}
+
+function onClientClosed(callback) {
+    if (typeof callback !== "function") throw new Error("Callback must be a function");
+    config.onConnectionClosed = callback;
+}
+
+function getUserIdentifier(ws) {
+    for (const identifier in users) {
+        if (users[identifier] == ws) return identifier;
+    }
+}
+
+function getGroupsByConnection(ws) {
+    let userGroups = [];
+    for (const identifier in groups) {
+        for (const userWs of groups[identifier]) {
+            if (userWs == ws) userGroups.push(identifier);
+        }
+    }
+    return userGroups;
 }
 
 module.exports = {
@@ -61,4 +86,5 @@ module.exports = {
     onConnection,
     checkAuthentication,
     clean,
+    onClientClosed,
 };
