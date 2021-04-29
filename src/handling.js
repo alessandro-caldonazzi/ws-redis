@@ -77,6 +77,27 @@ function getGroupsByConnection(ws) {
     return userGroups;
 }
 
+function pingPong(websocket) {
+    console.log(websocket.clients.size);
+    console.log(Object.keys(users), Object.keys(groups));
+    websocket.clients.forEach((ws) => {
+        if (!ws.isAlive) {
+            const userIdentifier = getUserIdentifier(ws);
+            const userGroups = getGroupsByConnection(ws);
+
+            if (userIdentifier) delete users[userIdentifier];
+            for (const groupId of userGroups) {
+                groups[groupId] = groups[groupId].filter((userWs) => userWs != ws);
+            }
+            console.log(groups, users);
+            return ws.terminate();
+        }
+        ws.isAlive = false;
+        console.log("ping...");
+        ws.ping();
+    });
+}
+
 module.exports = {
     callbacks,
     config,
@@ -87,4 +108,5 @@ module.exports = {
     checkAuthentication,
     clean,
     onClientClosed,
+    pingPong,
 };

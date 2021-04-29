@@ -3,10 +3,11 @@ const ws = require("ws");
 const utils = require("./utils");
 const handling = require("./handling");
 const Redis = require("ioredis");
-let redisPublisher, redisSubscriber, websocket;
+let redisPublisher, redisSubscriber, websocket, pingPongInterval;
 
 function setup() {
     websocket.on("connection", function connection(ws) {
+        ws.isAlive = true;
         ws.on("message", async function incoming(message) {
             if (!utils.isJson(message)) return;
             message = JSON.parse(message);
@@ -21,6 +22,10 @@ function setup() {
             } else {
                 handling.handleMessage(message, ws);
             }
+        });
+
+        ws.on("pong", () => {
+            ws.isAlive = true;
         });
     });
 }
@@ -77,10 +82,14 @@ module.exports = {
             } else {
                 resolve();
             }
+            pingPongInterval = setInterval(() => {
+                handling.pingPong(websocket);
+            }, 2000);
         });
     },
     close: async () => {
         await websocket.close();
+        clearInterval(pingPongInterval);
     },
     clean: () => {
         handling.clean();
