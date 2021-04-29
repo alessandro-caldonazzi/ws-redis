@@ -11,13 +11,10 @@ function setup() {
             if (!utils.isJson(message)) return;
             message = JSON.parse(message);
             if (utils.isInitial(message)) {
-                let checkAuthenticationCallback =
-                    handling.config.checkAuthenticationCallback;
+                let checkAuthenticationCallback = handling.config.checkAuthenticationCallback;
 
                 if (message.token && checkAuthenticationCallback) {
-                    const isAuthenticated = await checkAuthenticationCallback(
-                        message.token
-                    );
+                    const isAuthenticated = await checkAuthenticationCallback(message.token);
                     if (!isAuthenticated) return;
                 }
                 handling.config.onConnectionCallback(ws, message.token);
@@ -54,34 +51,33 @@ function sendMessageToGroup(identifier, channel, data, except) {
 module.exports = {
     ...exposedMethods,
     init: (wsInstance) => {
-        if (!(wsInstance instanceof ws || wsInstance instanceof ws.Server)) {
-            throw new Error("wsInstance must be a WebSocket instance");
-        }
-        websocket = wsInstance;
-        setup();
-        if (!redisPublisher) redisPublisher = new Redis();
-        if (!redisSubscriber) {
-            redisSubscriber = new Redis();
+        return new Promise((resolve, reject) => {
+            if (!(wsInstance instanceof ws || wsInstance instanceof ws.Server)) {
+                return reject("wsInstance must be a WebSocket instance");
+            }
+            websocket = wsInstance;
+            setup();
+            if (!redisPublisher) redisPublisher = new Redis();
+            if (!redisSubscriber) {
+                redisSubscriber = new Redis();
 
-            redisSubscriber.on("message", (channel, message) => {
-                //TODO: check if the message is valid
-                message = JSON.parse(message);
-                if (message.isGroup && message.identifier in handling.groups) {
-                    sendMessageToGroup(
-                        message.identifier,
-                        message.channel,
-                        message.data
-                    );
-                } else if (message.identifier in handling.users) {
-                    sendMessageToUser(
-                        message.identifier,
-                        message.channel,
-                        message.data
-                    );
-                }
-            });
-            redisSubscriber.subscribe("ws-redis");
-        }
+                redisSubscriber.on("message", (c, message) => {
+                    //TODO: check if the message is valid
+                    const { identifier, channel, data, isGroup } = JSON.parse(message);
+                    if (isGroup && identifier in handling.groups) {
+                        sendMessageToGroup(identifier, channel, data);
+                    } else if (identifier in handling.users) {
+                        sendMessageToUser(identifier, channel, data);
+                    }
+                });
+                redisSubscriber.subscribe("ws-redis", (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            } else {
+                resolve();
+            }
+        });
     },
     close: async () => {
         await websocket.close();
