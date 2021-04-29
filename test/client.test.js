@@ -2,6 +2,7 @@
 const WsClient = require("../src/client/client");
 const WebSocket = require("ws");
 const wsRedis = require("../src/index");
+const Redis = require("ioredis");
 let connection;
 
 test("setAuthenticationToken", (done) => {
@@ -84,11 +85,7 @@ test("send/receive on group", async (done) => {
         //add all connected user to testGroup
         wsRedis.addToGroup("testGroup", ws);
         if (connectedUsers === 2) {
-            wsRedis.sendMessageToGroup(
-                "testGroup",
-                "testChannel",
-                "testMessage"
-            );
+            wsRedis.sendMessageToGroup("testGroup", "testChannel", "testMessage");
         }
     });
 
@@ -118,6 +115,68 @@ test("send/receive on group", async (done) => {
             connUser2.close();
         }
     }
+});
+
+test("redis sub test (user)", async (done) => {
+    await wsRedis.init(new WebSocket.Server({ port: 8080 }));
+    wsRedis.onConnection((ws, authenticationToken) => {
+        wsRedis.addUser("testUser", ws);
+    });
+
+    connection = new WsClient({
+        url: "ws://localhost:8080",
+        websocket: WebSocket,
+    });
+    await connection.connect();
+
+    const redisConnection = new Redis();
+    redisConnection.on("connect", () => {
+        redisConnection.publish(
+            "ws-redis",
+            JSON.stringify({
+                identifier: "testUser",
+                channel: "testChannel",
+                data: "testMessage",
+                isGroup: false,
+            })
+        );
+    });
+
+    connection.onMessage("testChannel", (message) => {
+        expect(message).toBe("testMessage");
+        done();
+    });
+});
+
+test("redis sub test (group)", async (done) => {
+    await wsRedis.init(new WebSocket.Server({ port: 8080 }));
+    wsRedis.onConnection((ws, authenticationToken) => {
+        wsRedis.addToGroup("testGroup", ws);
+    });
+
+    connection = new WsClient({
+        url: "ws://localhost:8080",
+        websocket: WebSocket,
+    });
+    await connection.connect();
+
+    const redisConnection = new Redis();
+    redisConnection.on("connect", () => {
+        redisConnection.publish(
+            "ws-redis",
+            JSON.stringify({
+                identifier: "testGroup",
+                channel: "testChannel",
+                data: "testMessage",
+                isGroup: true,
+            })
+        );
+    });
+
+    connection.onMessage("testChannel", (message) => {
+        expect(message).toBe("testMessage");
+        done();
+    });
 });
 
 afterEach(async () => {
