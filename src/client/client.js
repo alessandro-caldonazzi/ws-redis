@@ -42,12 +42,9 @@ class WsClient {
     }
 
     onMessage(channel, callback) {
-        if (typeof channel !== "string")
-            throw new Error("Invalid channel name");
-        if (typeof callback !== "function")
-            throw new Error("Callback must be a function");
-        if (channel in this.callbacks)
-            throw new Error("This channel is already registered");
+        if (typeof channel !== "string") throw new Error("Invalid channel name");
+        if (typeof callback !== "function") throw new Error("Callback must be a function");
+        if (channel in this.callbacks) throw new Error("This channel is already registered");
         this.callbacks[channel] = callback;
     }
 
@@ -58,7 +55,8 @@ class WsClient {
         }
     };
 
-    close() {
+    async close() {
+        await this.send("reservedChannelWs", { action: "close" });
         this.connection.close();
     }
 
