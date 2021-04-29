@@ -104,9 +104,9 @@ test("provide duplicate callback to checkAuthentication", () => {
 });
 
 test("provide invalid WebSocket instance to init", () => {
-    expect(() => {
-        wsRedis.init("this is not a valid WebSocket instance");
-    }).toThrow(Error);
+    expect(wsRedis.init("this is not a valid WebSocket instance")).rejects.toEqual(
+        "wsInstance must be a WebSocket instance"
+    );
 });
 
 test("provide invalid json to isJson", () => {
@@ -116,7 +116,7 @@ test("provide invalid json to isJson", () => {
 
 test("redis pub test sending to user", (done) => {
     const redisConnection = new Redis();
-    redisConnection.on("connect", () => {
+    redisConnection.on("connect", async () => {
         redisConnection.on("message", (channel, message) => {
             message = JSON.parse(message);
             expect(message.identifier).toBe("userOnAnotherNodeInstance");
@@ -126,18 +126,14 @@ test("redis pub test sending to user", (done) => {
             done();
             redisConnection.disconnect();
         });
-        redisConnection.subscribe("ws-redis");
-        wsRedis.sendMessageToUser(
-            "userOnAnotherNodeInstance",
-            "channel",
-            "data"
-        );
+        await redisConnection.subscribe("ws-redis");
+        wsRedis.sendMessageToUser("userOnAnotherNodeInstance", "channel", "data");
     });
 });
 
 test("redis pub test sending to group", (done) => {
     const redisConnection = new Redis();
-    redisConnection.on("connect", () => {
+    redisConnection.on("connect", async () => {
         redisConnection.on("message", (channel, message) => {
             message = JSON.parse(message);
             expect(message.identifier).toBe("groupAvailableOnAnotherNode");
@@ -147,12 +143,8 @@ test("redis pub test sending to group", (done) => {
             done();
             redisConnection.disconnect();
         });
-        redisConnection.subscribe("ws-redis");
-        wsRedis.sendMessageToGroup(
-            "groupAvailableOnAnotherNode",
-            "channel",
-            "data"
-        );
+        await redisConnection.subscribe("ws-redis");
+        wsRedis.sendMessageToGroup("groupAvailableOnAnotherNode", "channel", "data");
     });
 });
 
