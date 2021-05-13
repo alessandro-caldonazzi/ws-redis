@@ -9,6 +9,10 @@ function setup() {
     websocket.on("connection", function connection(ws) {
         ws.isAlive = true;
         ws.on("message", async function incoming(message) {
+            if (message === "pong") {
+                ws.isAlive = true;
+                ws.send("ack");
+            }
             if (!utils.isJson(message)) return;
             message = JSON.parse(message);
             if (utils.isInitial(message)) {
@@ -23,9 +27,11 @@ function setup() {
                 handling.handleMessage(message, ws);
             }
         });
-
-        ws.on("pong", () => {
-            ws.isAlive = true;
+        ws.on("close", (aa) => {
+            handling.deleteUserByConnection(ws);
+        });
+        ws.on("error", (e) => {
+            console.log(e);
         });
     });
 }
@@ -41,16 +47,18 @@ function sendMessageToUser(identifier, channel, data) {
     }
 }
 
-function sendMessageToGroup(identifier, channel, data, except) {
+function sendMessageToGroup(identifier, channel, data, pubOnRedis = true) {
     if (identifier in handling.groups) {
         handling.groups[identifier].forEach((user) => {
             user.send(JSON.stringify({ data, channel }));
         });
     }
-    redisPublisher.publish(
-        "ws-redis",
-        JSON.stringify({ identifier, channel, data, isGroup: true })
-    );
+    if (pubOnRedis) {
+        redisPublisher.publish(
+            "ws-redis",
+            JSON.stringify({ identifier, channel, data, isGroup: true, pid: process.pid })
+        );
+    }
 }
 
 module.exports = {
@@ -68,9 +76,10 @@ module.exports = {
 
                 redisSubscriber.on("message", (c, message) => {
                     //TODO: check if the message is valid
-                    const { identifier, channel, data, isGroup } = JSON.parse(message);
+                    const { identifier, channel, data, isGroup, pid } = JSON.parse(message);
+                    if (pid == process.pid) return;
                     if (isGroup && identifier in handling.groups) {
-                        sendMessageToGroup(identifier, channel, data);
+                        sendMessageToGroup(identifier, channel, data, false);
                     } else if (identifier in handling.users) {
                         sendMessageToUser(identifier, channel, data);
                     }
@@ -82,6 +91,7 @@ module.exports = {
             } else {
                 resolve();
             }
+
             pingPongInterval = setInterval(() => {
                 handling.pingPong(websocket);
             }, 2000);
