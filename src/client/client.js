@@ -2,12 +2,14 @@ class WsClient {
     constructor({ url, websocket = null, authenticationToken = null }) {
         if (!websocket) websocket = WebSocket;
         if (authenticationToken) this.authenticationToken = authenticationToken;
-
-        this.url = url;
-        this.connection = new websocket(url);
-        this.connection.onmessage = this.handleMessage;
-        this.totMessage = 0;
+        this.config = {
+            websocket,
+            url,
+        };
         this.callbacks = {};
+        this.intervalCheckAcknowledge = setInterval(() => this.checkAcknowledge(this), 2000);
+        this.isAlive = true;
+        this._createConnection();
     }
 
     async connect() {
@@ -48,12 +50,24 @@ class WsClient {
         this.callbacks[channel] = callback;
     }
 
-    handleMessage = ({ data }) => {
+    onConnectionFailure(callback) {
+        if (typeof callback !== "function") throw new Error("Callback must be a function");
+        this.config.onConnectionFailure = callback;
+    }
+
+    onConnectionReestablished(callback) {
+        if (typeof callback !== "function") throw new Error("Callback must be a function");
+        this.config.onConnectionReestablished = callback;
+    }
+
+    handleMessage({ data }) {
+        if (data === "ping") return this._sendHeartbeat("pong");
+        if (data === "ack") return (this.lastAcknowledge = new Date().getTime());
         data = JSON.parse(data);
         if (data?.channel in this.callbacks && data.data) {
             this.callbacks[data.channel](data.data);
         }
-    };
+    }
 
     async close() {
         await this.send("reservedChannelWs", { action: "close" });
@@ -62,6 +76,32 @@ class WsClient {
 
     getReadyState() {
         return this.connection.readyState;
+    }
+
+    checkAcknowledge(self) {
+        if (new Date().getTime() - 5000 > self.lastAcknowledge || !self.lastAcknowledge) {
+            // two ack packets were lost
+            if (self.isAlive) {
+                self.isAlive = false;
+                self.config.onConnectionFailure?.();
+            }
+            self._createConnection();
+            this.connect();
+            console.log("Connection problem");
+        }
+    }
+
+    async _createConnection() {
+        this.connection = new this.config.websocket(this.config.url);
+        this.connection.onmessage = (message) => {
+            this.handleMessage(message);
+        };
+        this.totMessage = 0;
+    }
+
+    async _sendHeartbeat(data) {
+        if (!this.connection.readyState) await waitConnection(this.connection);
+        this.connection.send(data);
     }
 }
 
