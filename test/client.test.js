@@ -32,7 +32,9 @@ test("getTotMessages", async () => {
         url: "ws://localhost:8080",
         websocket: WebSocket,
     });
+
     await connection.connect();
+
     expect(connection.getTotMessages()).toBe(0);
 });
 
@@ -56,13 +58,15 @@ test("send/receive on channel", (done) => {
     });
 });
 
-test("provide invalid parameters in onMessage", () => {
+test("provide invalid parameters in onMessage", async (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
+    wsRedis.onConnection(() => {});
 
     connection = new WsClient({
         url: "ws://localhost:8080",
         websocket: WebSocket,
     });
+    await connection.connect();
     expect(() => {
         connection.onMessage(123, (message) => {});
     }).toThrow(Error);
@@ -75,6 +79,7 @@ test("provide invalid parameters in onMessage", () => {
     expect(() => {
         connection.onMessage("duplicateChannel", () => {});
     }).toThrow(Error);
+    done();
 });
 
 test("send/receive on group", async (done) => {
@@ -94,17 +99,14 @@ test("send/receive on group", async (done) => {
     const connUser1 = new WsClient({
         url: "ws://localhost:8080",
         websocket: WebSocket,
+        authenticationToken: "a",
     });
 
     const connUser2 = new WsClient({
         url: "ws://localhost:8080",
         websocket: WebSocket,
+        authenticationToken: "b",
     });
-    await connUser1.connect();
-    await connUser2.connect();
-
-    connUser1.onMessage("testChannel", _onMessage);
-    connUser2.onMessage("testChannel", _onMessage);
 
     function _onMessage(message) {
         expect(message).toBe("testMessage");
@@ -116,6 +118,11 @@ test("send/receive on group", async (done) => {
             connUser2.close();
         }
     }
+    connUser1.onMessage("testChannel", _onMessage);
+    connUser2.onMessage("testChannel", _onMessage);
+
+    connUser1.connect();
+    connUser2.connect();
 });
 
 test("redis sub test (user)", async (done) => {
@@ -207,27 +214,7 @@ afterEach(async () => {
     if (connection?.getReadyState()) {
         await connection.close();
     }
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, 10);
+    });
 });
-
-module.exports = {
-    connect: async () => {
-        const connection = new WsClient({
-            url: "ws://localhost:8080",
-            websocket: WebSocket,
-            authenticationToken: "authenticationToken",
-        });
-        await connection.connect();
-        connection.close();
-    },
-    sendMessageToChannel: async () => {
-        const connection = new WsClient({
-            url: "ws://localhost:8080",
-            websocket: WebSocket,
-            authenticationToken: "authenticationToken",
-        });
-        await connection.connect();
-        await connection.send("testChannel", "testMessage");
-        await connection.send("testChannel", "testMessage");
-        connection.close();
-    },
-};

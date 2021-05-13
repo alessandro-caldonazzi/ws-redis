@@ -3,10 +3,11 @@ const wsRedis = require("../src/index");
 const WebSocket = require("ws");
 const client = require("./client.test");
 const Redis = require("ioredis");
+const WsClient = require("../src/client/client");
 
-test("authentication", (done) => {
+test("authentication", async (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
-    client.sendMessageToChannel();
+    clientSimulator.sendMessageToChannel();
     wsRedis.checkAuthentication((authenticationToken) => {
         //check if authenticationToken is valid
         expect(authenticationToken).toBe("authenticationToken");
@@ -17,9 +18,9 @@ test("authentication", (done) => {
     wsRedis.onConnection(() => {});
 });
 
-test("authentication fails", (done) => {
+test("authentication fails", async (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
-    client.sendMessageToChannel();
+    clientSimulator.sendMessageToChannel();
     wsRedis.checkAuthentication((authenticationToken) => {
         //check if authenticationToken is valid
         expect(authenticationToken).toBe("authenticationToken");
@@ -32,16 +33,16 @@ test("authentication fails", (done) => {
 
 test("onConnection", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
-    client.connect();
     wsRedis.onConnection((ws, authenticationToken) => {
         expect(authenticationToken).toBe("authenticationToken");
         done();
     });
+    clientSimulator.connect();
 });
 
 test("receive message on channel", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
-    client.sendMessageToChannel();
+    clientSimulator.sendMessageToChannel();
 
     wsRedis.onMessage("testChannel", (data, ws) => {
         expect(data.message).toBe("testMessage");
@@ -115,44 +116,81 @@ test("provide invalid json to isJson", () => {
 });
 
 test("redis pub test sending to user", (done) => {
+    wsRedis.init(new WebSocket.Server({ port: 8080 }));
+
     const redisConnection = new Redis();
     redisConnection.on("connect", async () => {
         redisConnection.on("message", (channel, message) => {
             message = JSON.parse(message);
+            if (message.data != "testToUser") {
+                return; //avoid other messages
+            }
             expect(message.identifier).toBe("userOnAnotherNodeInstance");
             expect(message.channel).toBe("channel");
-            expect(message.data).toBe("data");
             expect(message.isGroup).toBe(false);
             done();
             redisConnection.disconnect();
         });
         await redisConnection.subscribe("ws-redis");
-        wsRedis.sendMessageToUser("userOnAnotherNodeInstance", "channel", "data");
+        wsRedis.sendMessageToUser("userOnAnotherNodeInstance", "channel", "testToUser");
     });
 });
 
 test("redis pub test sending to group", (done) => {
+    wsRedis.init(new WebSocket.Server({ port: 8080 }));
+
     const redisConnection = new Redis();
     redisConnection.on("connect", async () => {
         redisConnection.on("message", (channel, message) => {
             message = JSON.parse(message);
+            if (message.data != "testToGroup") {
+                return; //avoid other messages
+            }
             expect(message.identifier).toBe("groupAvailableOnAnotherNode");
             expect(message.channel).toBe("channel");
-            expect(message.data).toBe("data");
             expect(message.isGroup).toBe(true);
             done();
             redisConnection.disconnect();
         });
         await redisConnection.subscribe("ws-redis");
-        wsRedis.sendMessageToGroup("groupAvailableOnAnotherNode", "channel", "data");
+        wsRedis.sendMessageToGroup("groupAvailableOnAnotherNode", "channel", "testToGroup");
     });
 });
 
 afterEach(async () => {
     await wsRedis.close();
     wsRedis.clean();
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, 10);
+    });
 });
 
 afterAll(() => {
     //redis.quit();
 });
+const clientSimulator = {
+    connect: () => {
+        setTimeout(async () => {
+            const conn = new WsClient({
+                url: "ws://localhost:8080",
+                websocket: WebSocket,
+                authenticationToken: "authenticationToken",
+            });
+            await conn.connect();
+            conn.close();
+        }, 10);
+    },
+    sendMessageToChannel: () => {
+        setTimeout(async () => {
+            const conn = new WsClient({
+                url: "ws://localhost:8080",
+                websocket: WebSocket,
+                authenticationToken: "authenticationToken",
+            });
+            await conn.connect();
+            await conn.send("testChannel", "testMessage");
+            await conn.send("testChannel", "testMessage");
+            conn.close();
+        }, 10);
+    },
+};
