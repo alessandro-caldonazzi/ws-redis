@@ -44,8 +44,8 @@ test("receive message on channel", (done) => {
     wsRedis.init(new WebSocket.Server({ port: 8080 }));
     clientSimulator.sendMessageToChannel();
 
-    wsRedis.onMessage("testChannel", (data, ws) => {
-        expect(data.message).toBe("testMessage");
+    wsRedis.onMessage("testChannel", (message, ws) => {
+        expect(message.data).toBe("testMessage");
         done();
     });
     //required but not interested in this test
