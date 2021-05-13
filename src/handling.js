@@ -16,19 +16,6 @@ async function handleMessage(json, ws) {
     }
 }
 
-function onConnection(callback) {
-    if (typeof callback !== "function") throw new Error("Callback must be a function");
-    if (config.onConnectionCallback) throw new Error("onConnectionCallback is already defined");
-    config.onConnectionCallback = callback;
-}
-
-function checkAuthentication(callback) {
-    if (typeof callback !== "function") throw new Error("Callback must be a function");
-    if (config.checkAuthenticationCallback)
-        throw new Error("Authentication Callback is already defined");
-    config.checkAuthenticationCallback = callback;
-}
-
 function clean() {
     for (let member in callbacks) delete callbacks[member];
     for (let member in config) delete config[member];
@@ -52,11 +39,6 @@ function reservedChannelHandle(ws, data) {
     } else if (data.action == "close") {
         deleteUserByConnection(ws);
     }
-}
-
-function onClientClosed(callback) {
-    if (typeof callback !== "function") throw new Error("Callback must be a function");
-    config.onConnectionClosed = callback;
 }
 
 function getUserIdentifier(ws) {
@@ -103,10 +85,7 @@ module.exports = {
     users,
     groups,
     handleMessage,
-    onConnection,
-    checkAuthentication,
     clean,
-    onClientClosed,
     pingPong,
     deleteUserByConnection,
 };
