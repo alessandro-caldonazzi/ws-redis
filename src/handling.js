@@ -50,9 +50,7 @@ function reservedChannelHandle(ws, data) {
 
         config.onConnectionCallback(ws, data.token);
     } else if (data.action == "close") {
-        let userIdentifier = getUserIdentifier(ws);
-        let userGroups = getGroupsByConnection(ws);
-        config.onConnectionClosed?.(userIdentifier, userGroups);
+        deleteUserByConnection(ws);
     }
 }
 
@@ -77,20 +75,25 @@ function getGroupsByConnection(ws) {
     return userGroups;
 }
 
+function deleteUserByConnection(ws) {
+    const userIdentifier = getUserIdentifier(ws);
+    const userGroups = getGroupsByConnection(ws);
+
+    if (userIdentifier) delete users[userIdentifier];
+    for (const groupId of userGroups) {
+        groups[groupId] = groups[groupId].filter((userWs) => userWs != ws);
+    }
+    ws.terminate();
+    config.onConnectionClosed?.(userIdentifier, userGroups);
+}
+
 function pingPong(websocket) {
     websocket.clients.forEach((ws) => {
         if (!ws.isAlive) {
-            const userIdentifier = getUserIdentifier(ws);
-            const userGroups = getGroupsByConnection(ws);
-
-            if (userIdentifier) delete users[userIdentifier];
-            for (const groupId of userGroups) {
-                groups[groupId] = groups[groupId].filter((userWs) => userWs != ws);
-            }
-            return ws.terminate();
+            deleteUserByConnection(ws);
         }
         ws.isAlive = false;
-        ws.ping();
+        ws.send("ping");
     });
 }
 
@@ -105,4 +108,5 @@ module.exports = {
     clean,
     onClientClosed,
     pingPong,
+    deleteUserByConnection,
 };
