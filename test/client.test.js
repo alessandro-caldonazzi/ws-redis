@@ -146,6 +146,7 @@ test("redis sub test (user)", async (done) => {
                 channel: "testChannel",
                 data: "testMessage",
                 isGroup: false,
+                pid: 123,
             })
         );
     });
