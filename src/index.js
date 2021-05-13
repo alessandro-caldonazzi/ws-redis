@@ -1,3 +1,7 @@
+/**
+ * @module Server
+ */
+
 const exposedMethods = require("./exposedMethods");
 const ws = require("ws");
 const utils = require("./utils");

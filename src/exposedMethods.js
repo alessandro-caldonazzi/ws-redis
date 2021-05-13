@@ -1,3 +1,7 @@
+/**
+ * @module Server
+ */
+
 let { callbacks, users, groups, config } = require("./handling");
 
 /**
