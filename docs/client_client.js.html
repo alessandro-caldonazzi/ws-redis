@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Adding meta -->
+    
+
+    <!-- Adding external script-->
+    
+
+    <!-- Adding external style-->
+    
+
+    <!-- Adding scripts-->
+    
+
+    <!-- Adding style-->
+    
+
+    <!-- Adding overlay script-->
+    
+
+    <!-- Adding overlay style-->
+    
+
+
+    <title>
+      client/client.js
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/third-party/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/third-party/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/reset.css">
+    <link type="text/css" rel="stylesheet" href="styles/heading.css">
+    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-base.css">
+    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-light.css">
+    
+    <svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+    style="display:none">
+    <defs>
+        <symbol id="copy-icon" viewbox="0 0 488.3 488.3">
+            <g>
+                <path
+                    d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z" />
+                <path
+                    d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z" />
+            </g>
+        </symbol>
+        <symbol id='search-icon' viewBox="0 0 512 512">
+            <g>
+                <g>
+                    <path
+                        d="M225.474,0C101.151,0,0,101.151,0,225.474c0,124.33,101.151,225.474,225.474,225.474    c124.33,0,225.474-101.144,225.474-225.474C450.948,101.151,349.804,0,225.474,0z M225.474,409.323    c-101.373,0-183.848-82.475-183.848-183.848S124.101,41.626,225.474,41.626s183.848,82.475,183.848,183.848    S326.847,409.323,225.474,409.323z" />
+                </g>
+            </g>
+            <g>
+                <g>
+                    <path
+                        d="M505.902,476.472L386.574,357.144c-8.131-8.131-21.299-8.131-29.43,0c-8.131,8.124-8.131,21.306,0,29.43l119.328,119.328    c4.065,4.065,9.387,6.098,14.715,6.098c5.321,0,10.649-2.033,14.715-6.098C514.033,497.778,514.033,484.596,505.902,476.472z" />
+                </g>
+            </g>
+        </symbol>
+        <symbol id="down-icon" viewBox="0 0 16 16">
+            <path 
+                fill-rule="evenodd" 
+                clip-rule="evenodd" 
+                d="M12.7803 6.21967C13.0732 6.51256 13.0732 6.98744 12.7803 7.28033L8.53033 11.5303C8.23744 11.8232 7.76256 11.8232 7.46967 11.5303L3.21967 7.28033C2.92678 6.98744 2.92678 6.51256 3.21967 6.21967C3.51256 5.92678 3.98744 5.92678 4.28033 6.21967L8 9.93934L11.7197 6.21967C12.0126 5.92678 12.4874 5.92678 12.7803 6.21967Z"
+            >
+            </path>
+        </symbol>
+    </defs>
+</svg>
+  </head>
+
+  <body>
+
+    <nav class="navbar" id="navbar">
+      <div class="navbar-heading" id="navbar-heading"><a href="index.html"><h2 class="navbar-heading-text">Home</h2></a></div><div class="search-box" id="search-box"><div class="search-box-input-container"><input class="search-box-input" type="text" placeholder="Search..." id="search-box-input" /><svg class="search-icon" alt="search-icon"><use xlink:href="#search-icon"></use></svg></div><div class="search-item-container" id="search-item-container"><ul class="search-item-ul" id="search-item-ul"></ul></div></div><div class="sidebar-main-content" id="sidebar-main-content"><div class="accordion collapsed" id="9541397" > <h3 class="accordion-heading">Classes<svg><use xlink:href="#down-icon"></use></svg></h3><ul class="accordion-content"><li class="accordion collapsed child" id=9674048><div class="accordion-heading child"><a href="WsClient.html">WsClient</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="WsClient.html#connect">connect</a></li><li data-type='method'><a href="WsClient.html#getTotMessages">getTotMessages</a></li><li data-type='method'><a href="WsClient.html#onConnectionFailure">onConnectionFailure</a></li><li data-type='method'><a href="WsClient.html#onConnectionReestablished">onConnectionReestablished</a></li><li data-type='method'><a href="WsClient.html#onMessage">onMessage</a></li><li data-type='method'><a href="WsClient.html#send">send</a></li><li data-type='method'><a href="WsClient.html#setAuthenticationToken">setAuthenticationToken</a></li></ul></li></ul> </div><div class="accordion collapsed" id="5370560" > <h3 class="accordion-heading">Modules<svg><use xlink:href="#down-icon"></use></svg></h3><ul class="accordion-content"><li class="accordion collapsed child" id=5292841><div class="accordion-heading child"><a href="module-Server.html">Server</a><svg><use xlink:href="#down-icon"></use></svg></div><ul class='methods accordion-content'><li data-type='method'><a href="module-Server.html#~addToGroup">addToGroup</a></li><li data-type='method'><a href="module-Server.html#~addUser">addUser</a></li><li data-type='method'><a href="module-Server.html#~checkAuthentication">checkAuthentication</a></li><li data-type='method'><a href="module-Server.html#~deleteGroup">deleteGroup</a></li><li data-type='method'><a href="module-Server.html#~deleteUser">deleteUser</a></li><li data-type='method'><a href="module-Server.html#~init">init</a></li><li data-type='method'><a href="module-Server.html#~onClientClosed">onClientClosed</a></li><li data-type='method'><a href="module-Server.html#~onConnection">onConnection</a></li><li data-type='method'><a href="module-Server.html#~onMessage">onMessage</a></li><li data-type='method'><a href="module-Server.html#~sendMessageToGroup">sendMessageToGroup</a></li><li data-type='method'><a href="module-Server.html#~sendMessageToUser">sendMessageToUser</a></li></ul></li></ul> </div></div>
+      
+
+    </nav>
+    <div class="navbar-ham" id="navbar-ham">
+      <div>
+        <div class="first"></div>
+        <div class="second"></div>
+        <div class="third"></div>
+      </div>
+    </div>
+
+    <div id="main" class="main-content">
+      
+      <h1 id='page-title' class="page-title">
+        client/client.js
+      </h1>
+      
+
+      
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Class rapresenting the client connection
+ */
+class WsClient {
+    /**
+     * @param {Object} option
+     * @param {Url} option.url - Url to websocket server (ws://x.x)
+     * @param {WebSocket=} option.websocket - Class rapresent the websocket connection, if you are on nodejs use ws otherwise leave blank
+     * @param {*=} authenticationToken - If you want to authenticate the user set this and validate it on server
+     */
+    constructor({ url, websocket = null, authenticationToken = null }) {
+        if (!websocket) websocket = WebSocket;
+        if (authenticationToken) this.authenticationToken = authenticationToken;
+        /** @private */
+        this.config = {
+            websocket,
+            url,
+        };
+        /** @private */
+        this.callbacks = {};
+        /** @private */
+        this.intervalCheckAcknowledge = setInterval(() => this.checkAcknowledge(this), 2000);
+        /** @private */
+        this.isAlive = true;
+        this._createConnection();
+    }
+
+    /**
+     * Start ws connection, you need to call this method to make a connection
+     * @return {Promise} resolve the promise when the connection is established
+     */
+    async connect() {
+        return new Promise((resolve) => {
+            if (this.getReadyState() == 1) this.send(null, "connection");
+            else
+                this.connection.onopen = (e) => {
+                    this.send(null, "connection");
+                    resolve(true);
+                };
+        });
+    }
+
+    /**
+     * Send message to server
+     * @param {string} channel - Channel name (server need to listen on it with onMessage() )
+     * @param {*} data - Data to be sent
+     */
+    async send(channel, data) {
+        let message = { data, channel };
+        if (this.authenticationToken) message.token = this.authenticationToken;
+        if (!this.totMessage++) message.isInitial = true;
+        if (!this.connection.readyState) await waitConnection(this.connection);
+        await this.connection.send(JSON.stringify(message));
+    }
+
+    /**
+     * use this to change your authenticationToken
+     */
+    setAuthenticationToken(authenticationToken) {
+        this.authenticationToken = authenticationToken;
+        this.send("reservedChannelWs", {
+            action: "setAuthenticationToken",
+            token: this.authenticationToken,
+        });
+    }
+
+    /**
+     * @return {Number} Total number of message sent
+     */
+    getTotMessages() {
+        return this.totMessage - 1;
+    }
+
+    /**
+     * Callback where to receive message specific to a channel
+     * @callback onMessageCallback
+     * @param {*} data - Data sent by server
+     * @private
+     */
+
+    /**
+     * Set the callback to call when the user receive a message
+     * @param {string} channel - Channel name to listen to
+     * @param {onMessageCallback} callback - Callback where to receive the message
+     */
+    onMessage(channel, callback) {
+        if (typeof channel !== "string") throw new Error("Invalid channel name");
+        if (typeof callback !== "function") throw new Error("Callback must be a function");
+        if (channel in this.callbacks) throw new Error("This channel is already registered");
+        this.callbacks[channel] = callback;
+    }
+
+    /**
+     * Set the callback to call when the connection goes down
+     * @param {function} callback - zero parameter function called when connection is down
+     */
+    onConnectionFailure(callback) {
+        if (typeof callback !== "function") throw new Error("Callback must be a function");
+        this.config.onConnectionFailure = callback;
+    }
+
+    /**
+     * Set the callback to call when the connection comes back online
+     * @param {function} callback - zero parameter function called when the connection comes back online
+     */
+    onConnectionReestablished(callback) {
+        if (typeof callback !== "function") throw new Error("Callback must be a function");
+        this.config.onConnectionReestablished = callback;
+    }
+
+    /**
+     * @private
+     */
+    handleMessage({ data }) {
+        if (data === "ping") return this._sendHeartbeat("pong");
+        if (data === "ack") return (this.lastAcknowledge = new Date().getTime());
+        data = JSON.parse(data);
+        if (data?.channel in this.callbacks &amp;&amp; data.data) {
+            this.callbacks[data.channel](data.data);
+        }
+    }
+
+    async close() {
+        await this.send("reservedChannelWs", { action: "close" });
+        this.connection.close();
+    }
+
+    getReadyState() {
+        return this.connection.readyState;
+    }
+
+    /**
+     * @private
+     */
+    checkAcknowledge(self) {
+        if (new Date().getTime() - 5000 > self.lastAcknowledge || !self.lastAcknowledge) {
+            // two ack packets were lost
+            if (self.isAlive) {
+                self.isAlive = false;
+                self.config.onConnectionFailure?.();
+            }
+            self._createConnection();
+            this.connect();
+            console.log("Connection problem");
+        }
+    }
+
+    /**
+     * @private
+     */
+    async _createConnection() {
+        /** @private */
+        this.connection = new this.config.websocket(this.config.url);
+        this.connection.onmessage = (message) => {
+            this.handleMessage(message);
+        };
+        /** @private */
+        this.totMessage = 0;
+    }
+
+    /**
+     * @private
+     */
+    async _sendHeartbeat(data) {
+        if (!this.connection.readyState) await waitConnection(this.connection);
+        this.connection.send(data);
+    }
+}
+
+/**
+ * @private
+ */
+async function waitConnection(connection) {
+    return new Promise((resolve, reject) => {
+        let i = 0;
+        const listener = setInterval(() => {
+            if (connection.readyState) {
+                resolve(true);
+                return clearInterval(listener);
+            }
+            if (++i > 20) throw new Error("Cannot send");
+        }, 10);
+    });
+}
+
+module.exports = WsClient;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    </div>
+
+    <footer class="footer" id="footer">
+      
+    </footer>
+
+    <script src="scripts/third-party/prettify.js"></script>
+    <script src="scripts/third-party/lang-css.js"></script>
+    <script type="text/javascript" src="scripts/misc.js"></script>
+
+    <script>prettyPrint();</script>
+    <script src="scripts/linenumber.js"></script>
+    <script src="scripts/fix-code-block.js"></script>
+    <script src="scripts/fix-navbar.js"></script>
+    
+      <script src="scripts/search.js"></script>
+      <script src="scripts/third-party/fuse.js"></script>
+      <script>
+        var list = [{"title":"WsClient","link":"<a href=\"WsClient.html\">WsClient</a>"},{"title":"WsClient#connect","link":"<a href=\"WsClient.html#connect\">WsClient &rtrif; connect</a>"},{"title":"WsClient#getTotMessages","link":"<a href=\"WsClient.html#getTotMessages\">WsClient &rtrif; getTotMessages</a>"},{"title":"WsClient#onConnectionFailure","link":"<a href=\"WsClient.html#onConnectionFailure\">WsClient &rtrif; onConnectionFailure</a>"},{"title":"WsClient#onConnectionReestablished","link":"<a href=\"WsClient.html#onConnectionReestablished\">WsClient &rtrif; onConnectionReestablished</a>"},{"title":"WsClient#onMessage","link":"<a href=\"WsClient.html#onMessage\">WsClient &rtrif; onMessage</a>"},{"title":"WsClient#send","link":"<a href=\"WsClient.html#send\">WsClient &rtrif; send</a>"},{"title":"WsClient#setAuthenticationToken","link":"<a href=\"WsClient.html#setAuthenticationToken\">WsClient &rtrif; setAuthenticationToken</a>"},{"title":"Server","link":"<a href=\"module-Server.html\">Server</a>"},{"title":"module:Server~addToGroup","link":"<a href=\"module-Server.html#~addToGroup\">module:Server~addToGroup &rtrif; undefined</a>"},{"title":"module:Server~addUser","link":"<a href=\"module-Server.html#~addUser\">module:Server~addUser &rtrif; undefined</a>"},{"title":"module:Server~checkAuthentication","link":"<a href=\"module-Server.html#~checkAuthentication\">module:Server~checkAuthentication &rtrif; undefined</a>"},{"title":"module:Server~deleteGroup","link":"<a href=\"module-Server.html#~deleteGroup\">module:Server~deleteGroup &rtrif; undefined</a>"},{"title":"module:Server~deleteUser","link":"<a href=\"module-Server.html#~deleteUser\">module:Server~deleteUser &rtrif; undefined</a>"},{"title":"module:Server~init","link":"<a href=\"module-Server.html#~init\">module:Server~init &rtrif; undefined</a>"},{"title":"module:Server~onClientClosed","link":"<a href=\"module-Server.html#~onClientClosed\">module:Server~onClientClosed &rtrif; undefined</a>"},{"title":"module:Server~onConnection","link":"<a href=\"module-Server.html#~onConnection\">module:Server~onConnection &rtrif; undefined</a>"},{"title":"module:Server~onMessage","link":"<a href=\"module-Server.html#~onMessage\">module:Server~onMessage &rtrif; undefined</a>"},{"title":"module:Server~sendMessageToGroup","link":"<a href=\"module-Server.html#~sendMessageToGroup\">module:Server~sendMessageToGroup &rtrif; undefined</a>"},{"title":"module:Server~sendMessageToUser","link":"<a href=\"module-Server.html#~sendMessageToUser\">module:Server~sendMessageToUser &rtrif; undefined</a>"}];
+        var options = 
+          setupSearch(list, options)
+      </script>
+    
+
+    
+
+    
+
+    
+
+    
+
+
+  </body>
+
+</html>
