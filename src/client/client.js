@@ -75,6 +75,7 @@ class WsClient {
      * Callback where to receive message specific to a channel
      * @callback onMessageCallback
      * @param {*} data - Data sent by server
+     * @private
      */
 
     /**
