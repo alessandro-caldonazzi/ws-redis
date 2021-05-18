@@ -24,7 +24,7 @@ const ws = require("ws");
 wsRedis.init(new ws.Server({ port: 8080 }));
 ```
 
-### onConnection
+### [onConnection](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~onConnection)
 
 Sets the callback to be called when a user logs on
 
@@ -35,7 +35,7 @@ wsRedis.onConnection((wsInstance, authenticationToken) => {
 });
 ```
 
-### Handle authentication
+### [Handle authentication](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~checkAuthentication)
 
 Sets a callback to validate the authenticationToken set by the client (optional).
 
@@ -50,7 +50,7 @@ wsRedis.checkAuthentication((authenticationToken) =>{
 });
 ```
 
-### Identify users and groups
+### [Identify users and groups](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~addToGroup)
 
 You can identify a user with a string at any time, for example during connection.
 
@@ -69,7 +69,7 @@ wsRedis.onConnection((wsInstance, authenticationToken) => {
 });
 ```
 
-### Handle messages
+### [Handle messages](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~onMessage)
 
 Messages are sent/received on channels, you have to manage messages coming from different channels separately.
 
@@ -83,7 +83,7 @@ wsRedis.onMessage("channelName", (message, wsInstance, userIdentifier) => {
 });
 ```
 
-### Send message to user
+### [Send message to user](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~sendMessageToUser)
 
 To send a message you have to specify the user identifier (set in addUser()), the channel and the message to be sent, you can also pass a JSON
 
@@ -93,13 +93,13 @@ wsRedis.sendMessageToUser("userName", "channelName", "data I want to send");
 
 If you have set up redis, in case the specified user is not on this node server, it will be sent from the node instance that owns that user
 
-### Send message to group
+### [Send message to group](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~sendMessageToGroup)
 
 ```js
 wsRedis.sendMessageToGroup("groupName", "channelName", "data I want to send");
 ```
 
-### Handle client closed connection
+### [Handle client closed connection](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~onClientClosed)
 
 When a client disconnects with the close() method or due to connection problems, a callback (if set) is called on the server to notify you of the incident
 
@@ -107,5 +107,90 @@ When a client disconnects with the close() method or due to connection problems,
 wsRedis.onClientClosed((userIdentifier, groups) => {
     //userIdentifier of the disconnected user
     //groups is a string Array, contains the identifier of the groups in which the user participated
+});
+```
+
+## [Client:](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html)
+
+The client can be used either on node with the ws library or on a browser.
+If you are on browser you can include it from cdn:
+
+```html
+<script
+    src="https://cdn.jsdelivr.net/gh/alessandro-caldonazzi/ws-redis/src/client/client.js"
+    defer
+></script>
+```
+
+### Initiate
+
+If you are on browser use WebSocket
+
+```js
+const connection = new WsClient({
+    url: "ws://x.y:8080",
+    websocket: WebSocket,
+});
+connection.connect();
+```
+
+If you are on nodejs use the ws library
+
+```js
+const WebSocket = require("ws");
+const connection = new WsClient({
+    url: "ws://x.y:8080",
+    websocket: WebSocket,
+    authenticationToken: "jwt for example", // this is optional, use this if you need authentication (remember to set the checkAuthentication callback on server)
+});
+connection.connect();
+```
+
+### [connect](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#connect)
+
+To start the ws connection you need to call `connect()`
+Returns a promise, if you need to wait for a successful connection with await
+
+```js
+connection.connect();
+```
+
+```js
+await connection.connect();
+```
+
+### [Handle message](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#onMessage)
+
+```js
+connection.onMessage("channelName", (data) => {
+    console.log(data);
+});
+```
+
+### [Send message to server](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#send)
+
+```js
+connection.send("channelName", "your data");
+```
+
+Data can be JSON
+
+### [onConnectionFailure](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#onConnectionFailure)
+
+Set a callback to be notified when connection fail (for example connection instability)
+
+```js
+connection.onConnectionFailure(() => {
+    console.warn("connection lost");
+});
+```
+
+### [onConnectionReestablished](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#onConnectionReestablished)
+
+Set a callback to be notified when the connection is re-established
+
+```js
+connection.onConnectionReestablished(() => {
+    console.log("connection re-established");
 });
 ```
