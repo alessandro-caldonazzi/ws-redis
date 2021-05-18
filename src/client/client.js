@@ -72,16 +72,9 @@ class WsClient {
     }
 
     /**
-     * Callback where to receive message specific to a channel
-     * @callback onMessageCallback
-     * @param {*} data - Data sent by server
-     * @private
-     */
-
-    /**
      * Set the callback to call when the user receive a message
      * @param {string} channel - Channel name to listen to
-     * @param {onMessageCallback} callback - Callback where to receive the message
+     * @param {onMessageCallbackClient} callback - Callback where to receive the message
      */
     onMessage(channel, callback) {
         if (typeof channel !== "string") throw new Error("Invalid channel name");
