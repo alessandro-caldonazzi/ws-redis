@@ -9,6 +9,10 @@ Also, it allows you to use redis as a publish - subscribe for websocket message 
 
 It is divided into a server library and a client library
 
+## Complete Docs
+
+In this readme you will find an introduction, you can read the specific documentation [here](https://alessandro-caldonazzi.github.io/ws-redis/index.html)
+
 ## Server Library
 
 ### Installation
