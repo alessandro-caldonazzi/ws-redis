@@ -28,7 +28,7 @@
 
 
     <title>
-      index.js
+      jsdocTypeDef.js
     </title>
 
     <!--[if lt IE 9]>
@@ -96,7 +96,7 @@
     <div id="main" class="main-content">
       
       <h1 id='page-title' class="page-title">
-        index.js
+        jsdocTypeDef.js
       </h1>
       
 
@@ -107,139 +107,45 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @module Server
- */
-
-const exposedMethods = require("./exposedMethods");
-const ws = require("ws");
-const utils = require("./utils");
-const handling = require("./handling");
-const Redis = require("ioredis");
-let redisPublisher, redisSubscriber, websocket, pingPongInterval;
-
-function setup() {
-    websocket.on("connection", function connection(ws) {
-        ws.isAlive = true;
-        ws.on("message", async function incoming(message) {
-            if (message === "pong") {
-                ws.isAlive = true;
-                ws.send("ack");
-            }
-            if (!utils.isJson(message)) return;
-            message = JSON.parse(message);
-            if (utils.isInitial(message)) {
-                let checkAuthenticationCallback = handling.config.checkAuthenticationCallback;
-
-                if (message.token &amp;&amp; checkAuthenticationCallback) {
-                    const isAuthenticated = await checkAuthenticationCallback(message.token);
-                    if (!isAuthenticated) return;
-                }
-                handling.config.onConnectionCallback(ws, message.token);
-            } else {
-                handling.handleMessage(message, ws);
-            }
-        });
-        ws.on("close", () => {
-            handling.deleteUserByConnection(ws);
-        });
-        ws.on("error", (e) => {
-            console.log(e);
-        });
-    });
-}
+            <pre class="prettyprint source linenums"><code>// Server
 
 /**
- * Send message to a specific user
- * @param {string} identifier - Username / user identifier
- * @param {string} channel - Channel name (client will receive a message on this channel)
- * @param {*} data - Data to send
+ * Callback where to receive new user connection
+ * @callback onConnectionCallback
+ * @param {WebSocket} ws - Websocket client instance, useful if you want to add the user to a group
+ * @param {*} token - User authenticationToken set on client side
  */
-function sendMessageToUser(identifier, channel, data) {
-    if (identifier in handling.users) {
-        handling.users[identifier].send(JSON.stringify({ data, channel }));
-    } else {
-        redisPublisher.publish(
-            "ws-redis",
-            JSON.stringify({ identifier, channel, data, isGroup: false })
-        );
-    }
-}
 
 /**
- * Send message to all users in the given group
- * @param {string} identifier - Group name
- * @param {string} channel - Channel name (clients will receive a message on this channel)
- * @param {*} data - Data to send
- * @param {boolean=} pubOnRedis - Whether to publish on redis to ensure delivery to all clients
+ * Callback where to receive message specific to a channel
+ * @callback onMessageCallbackServer
+ * @param {Object} message - Json object containing the message and the authenticationToken
+ * @param {*} message.authenticationToken - The authenticationToken set on client side
+ * @param {*} message.data - Data sent by client
+ * @param {WebSocket} ws - Websocket client instance, useful if you want to add the user to a group
  */
-function sendMessageToGroup(identifier, channel, data, pubOnRedis = true) {
-    if (identifier in handling.groups) {
-        handling.groups[identifier].forEach((user) => {
-            user.send(JSON.stringify({ data, channel }));
-        });
-    }
-    if (pubOnRedis) {
-        redisPublisher.publish(
-            "ws-redis",
-            JSON.stringify({ identifier, channel, data, isGroup: true, pid: process.pid })
-        );
-    }
-}
 
 /**
- * Initiate ws-redis
- * @param {WebSocket} wsInstance - WebSocket server instance
- * @return {Promise} Promise object rapresents the redis status
+ * Function where you can validate the authenticationToken
+ * @callback checkAuthenticationCallback
+ * @param {*} token - User authenticationToken set on client side
+ * @return {boolean|Promise&lt;boolean>} true means the token is valid
  */
-async function init(wsInstance) {
-    return new Promise((resolve, reject) => {
-        if (!(wsInstance instanceof ws || wsInstance instanceof ws.Server)) {
-            return reject("wsInstance must be a WebSocket instance");
-        }
-        websocket = wsInstance;
-        setup();
-        if (!redisPublisher) redisPublisher = new Redis();
-        if (!redisSubscriber) {
-            redisSubscriber = new Redis();
 
-            redisSubscriber.on("message", (c, message) => {
-                //TODO: check if the message is valid
-                const { identifier, channel, data, isGroup, pid } = JSON.parse(message);
-                if (pid == process.pid) return;
-                if (isGroup &amp;&amp; identifier in handling.groups) {
-                    sendMessageToGroup(identifier, channel, data, false);
-                } else if (identifier in handling.users) {
-                    sendMessageToUser(identifier, channel, data);
-                }
-            });
-            redisSubscriber.subscribe("ws-redis", (err) => {
-                if (err) reject(err);
-                else resolve();
-            });
-        } else {
-            resolve();
-        }
+/**
+ * Callback where to be notified when user close the connection
+ * @callback onClientClosedCallback
+ * @param {string} userIdentifier - Identifier of the user
+ * @param {String[]} groups - List of groups in which the user was present
+ */
 
-        pingPongInterval = setInterval(() => {
-            handling.pingPong(websocket);
-        }, 2000);
-    });
-}
+// Client
 
-module.exports = {
-    ...exposedMethods,
-    init,
-    close: async () => {
-        await websocket.close();
-        clearInterval(pingPongInterval);
-    },
-    clean: () => {
-        handling.clean();
-    },
-    sendMessageToUser,
-    sendMessageToGroup,
-};
+/**
+ * Callback where to receive message specific to a channel
+ * @callback onMessageCallbackClient
+ * @param {*} data - Data sent by server
+ */
 </code></pre>
         </article>
     </section>
