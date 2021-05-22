@@ -1,6 +1,6 @@
 {
     "name": "ws-redis",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "description": "Use redis as publish-subscriber for websocket message delivery",
     "main": "src/index.js",
     "author": "Alessandro Caldonazzi",
