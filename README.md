@@ -11,7 +11,7 @@ It is divided into a server library and a client library
 
 ## Complete Docs
 
-In this readme you will find an introduction, you can read the specific documentation [here](https://alessandro-caldonazzi.github.io/ws-redis/index.html)
+In this readme you will find an introduction, you can read the specific documentation [here](https://ws-redis.netlify.app/)
 
 ## Server Library
 
@@ -28,7 +28,7 @@ const ws = require("ws");
 wsRedis.init(new ws.Server({ port: 8080 }));
 ```
 
-### [onConnection](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~onConnection)
+### [onConnection](https://ws-redis.netlify.app/module-Server.html#~onConnection)
 
 Sets the callback to be called when a user logs on
 
@@ -39,7 +39,7 @@ wsRedis.onConnection((wsInstance, authenticationToken) => {
 });
 ```
 
-### [Handle authentication](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~checkAuthentication)
+### [Handle authentication](https://ws-redis.netlify.app/module-Server.html#~checkAuthentication)
 
 Sets a callback to validate the authenticationToken set by the client (optional).
 
@@ -54,7 +54,7 @@ wsRedis.checkAuthentication((authenticationToken) =>{
 });
 ```
 
-### [Identify users and groups](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~addToGroup)
+### [Identify users and groups](https://ws-redis.netlify.app/module-Server.html#~addToGroup)
 
 You can identify a user with a string at any time, for example during connection.
 
@@ -73,7 +73,7 @@ wsRedis.onConnection((wsInstance, authenticationToken) => {
 });
 ```
 
-### [Handle messages](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~onMessage)
+### [Handle messages](https://ws-redis.netlify.app/module-Server.html#~onMessage)
 
 Messages are sent/received on channels, you have to manage messages coming from different channels separately.
 
@@ -87,7 +87,7 @@ wsRedis.onMessage("channelName", (message, wsInstance, userIdentifier) => {
 });
 ```
 
-### [Send message to user](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~sendMessageToUser)
+### [Send message to user](https://ws-redis.netlify.app/module-Server.html#~sendMessageToUser)
 
 To send a message you have to specify the user identifier (set in addUser()), the channel and the message to be sent, you can also pass a JSON
 
@@ -97,13 +97,13 @@ wsRedis.sendMessageToUser("userName", "channelName", "data I want to send");
 
 If you have set up redis, in case the specified user is not on this node server, it will be sent from the node instance that owns that user
 
-### [Send message to group](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~sendMessageToGroup)
+### [Send message to group](https://ws-redis.netlify.app/module-Server.html#~sendMessageToGroup)
 
 ```js
 wsRedis.sendMessageToGroup("groupName", "channelName", "data I want to send");
 ```
 
-### [Handle client closed connection](https://alessandro-caldonazzi.github.io/ws-redis/module-Server.html#~onClientClosed)
+### [Handle client closed connection](https://ws-redis.netlify.app/module-Server.html#~onClientClosed)
 
 When a client disconnects with the close() method or due to connection problems, a callback (if set) is called on the server to notify you of the incident
 
@@ -114,7 +114,7 @@ wsRedis.onClientClosed((userIdentifier, groups) => {
 });
 ```
 
-## [Client:](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html)
+## [Client:](https://ws-redis.netlify.app/WsClient.html)
 
 The client can be used either on node with the ws library or on a browser.
 If you are on browser you can include it from cdn:
@@ -150,7 +150,7 @@ const connection = new WsClient({
 connection.connect();
 ```
 
-### [connect](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#connect)
+### [connect](https://ws-redis.netlify.app/WsClient.html#connect)
 
 To start the ws connection you need to call `connect()`
 Returns a promise, if you need to wait for a successful connection with await
@@ -163,7 +163,7 @@ connection.connect();
 await connection.connect();
 ```
 
-### [Handle message](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#onMessage)
+### [Handle message](https://ws-redis.netlify.app/WsClient.html#onMessage)
 
 ```js
 connection.onMessage("channelName", (data) => {
@@ -171,7 +171,7 @@ connection.onMessage("channelName", (data) => {
 });
 ```
 
-### [Send message to server](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#send)
+### [Send message to server](https://ws-redis.netlify.app/WsClient.html#send)
 
 ```js
 connection.send("channelName", "your data");
@@ -179,7 +179,7 @@ connection.send("channelName", "your data");
 
 Data can be JSON
 
-### [onConnectionFailure](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#onConnectionFailure)
+### [onConnectionFailure](https://ws-redis.netlify.app/WsClient.html#onConnectionFailure)
 
 Set a callback to be notified when connection fail (for example connection instability)
 
@@ -189,7 +189,7 @@ connection.onConnectionFailure(() => {
 });
 ```
 
-### [onConnectionReestablished](https://alessandro-caldonazzi.github.io/ws-redis/WsClient.html#onConnectionReestablished)
+### [onConnectionReestablished](https://ws-redis.netlify.app/WsClient.html#onConnectionReestablished)
 
 Set a callback to be notified when the connection is re-established
 
