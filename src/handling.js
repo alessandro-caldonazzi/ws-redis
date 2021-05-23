@@ -66,7 +66,9 @@ function deleteUserByConnection(ws) {
         groups[groupId] = groups[groupId].filter((userWs) => userWs != ws);
     }
     ws.terminate();
-    config.onConnectionClosed?.(userIdentifier, userGroups);
+
+    if (userIdentifier || userGroups.length != 0)
+        config.onConnectionClosed?.(userIdentifier, userGroups);
 }
 
 function pingPong(websocket) {
