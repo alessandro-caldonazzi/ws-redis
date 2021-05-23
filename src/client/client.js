@@ -31,10 +31,19 @@ class WsClient {
      */
     async connect() {
         return new Promise((resolve) => {
-            if (this.getReadyState() == 1) this.send(null, "connection");
-            else
+            if (this.getReadyState() == 1) {
+                this.send(null, "connection");
+                if (!this.isAlive) {
+                    this.isAlive = true;
+                    this.config.onConnectionReestablished?.();
+                }
+            } else
                 this.connection.onopen = (e) => {
                     this.send(null, "connection");
+                    if (!this.isAlive) {
+                        this.isAlive = true;
+                        this.config.onConnectionReestablished?.();
+                    }
                     resolve(true);
                 };
         });
@@ -62,6 +71,10 @@ class WsClient {
             action: "setAuthenticationToken",
             token: this.authenticationToken,
         });
+    }
+
+    getAuthenticationToken() {
+        return this.authenticationToken;
     }
 
     /**
@@ -144,6 +157,7 @@ class WsClient {
     async _createConnection() {
         /** @private */
         this.connection = new this.config.websocket(this.config.url);
+        this.connection.onerror = () => {};
         this.connection.onmessage = (message) => {
             this.handleMessage(message);
         };
